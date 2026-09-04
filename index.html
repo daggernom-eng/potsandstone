@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pots and Stones Coffee & Eatery | Specialty Coffee, Dimsums & Thin Crust Pizzas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rozha+One&display=swap');
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #f8f6f2;
+      color: #1c1611;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .animate-scale-in {
+      animation: scaleIn 0.2s ease-out forwards;
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            espresso: '#231b15',
+            'espresso-light': '#382b22',
+            amber: {
+              750: '#b45309',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f8f6f2] min-h-screen text-gray-900 pb-28">
+
+  <!-- Main Mobile App Container -->
+  <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-[#231b15] text-white shadow-md">
+      <div class="px-4 pt-3 pb-2 flex items-center justify-between">
+        <div class="flex items-center space-x-2 flex-1 min-w-0 pr-2">
+          <i data-lucide="map-pin" class="w-4 h-4 text-amber-500 shrink-0"></i>
+          <div class="min-w-0">
+            <div class="flex items-center space-x-1 cursor-pointer">
+              <span class="font-bold text-sm tracking-tight truncate">Pots & Stones, Kathgodam</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-300 shrink-0"></i>
+            </div>
+            <p class="text-[11px] text-amber-200/80 truncate">171/2 Bareilly - Nainital Rd, opp. KFC</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 shrink-0">
+          <div class="flex items-center space-x-1 bg-white/10 border border-amber-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">
+            <span class="text-amber-400">☕</span>
+            <span class="text-amber-100">120/600</span>
+          </div>
+
+          <button id="search-toggle-btn" class="p-1.5 rounded-full hover:bg-white/10 transition-colors">
+            <i data-lucide="search" class="w-4 h-4 text-white"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Expandable Search Input -->
+      <div id="search-bar-container" class="hidden px-4 pb-2">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search Dimsums, Ravioli, Margherita, Kitkat Shake..."
+            className="w-full bg-white text-gray-800 placeholder-gray-400 text-xs rounded-full pl-9 pr-8 py-2 outline-none shadow-inner"
+            style="width: 100%; padding-left: 2.25rem; padding-right: 2rem; padding-top: 0.5rem; padding-bottom: 0.5rem; border-radius: 9999px; background: white; color: #1f2937; font-size: 0.75rem;"
+          />
+          <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">✕</button>
+        </div>
+      </div>
+
+      <!-- Order Mode Tabs -->
+      <div class="px-3 pb-2.5">
+        <div class="grid grid-cols-3 bg-black/40 p-1 rounded-xl backdrop-blur-xs text-xs font-medium border border-amber-900/30">
+          <button id="mode-delivery" class="mode-btn py-1.5 px-2 rounded-lg text-center transition-all bg-amber-600 text-white font-bold shadow-sm" onclick="setMode('Delivery')">
+            <span class="block leading-tight">Delivery</span>
+            <span class="text-[10px] opacity-90 font-normal">30-40 Mins</span>
+          </button>
+          <button id="mode-takeaway" class="mode-btn py-1.5 px-2 rounded-lg text-center transition-all text-gray-300 hover:text-white" onclick="setMode('Takeaway')">
+            <span class="block leading-tight">Takeaway</span>
+            <span class="text-[10px] opacity-90 font-normal">Kerbside Pickup</span>
+          </button>
+          <button id="mode-dinein" class="mode-btn py-1.5 px-2 rounded-lg text-center transition-all text-gray-300 hover:text-white" onclick="setMode('Dine-in')">
+            <span class="block leading-tight">Dine-in</span>
+            <span class="text-[10px] opacity-90 font-normal">Table Order</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Banner Carousel -->
+    <div class="relative overflow-hidden bg-gradient-to-b from-[#231b15] via-[#1a1410] to-[#f8f6f2] pt-2 pb-4 px-4">
+      <div id="banner-card" class="relative w-full aspect-[2.2/1] rounded-2xl overflow-hidden shadow-xl border border-amber-500/20">
+        <div id="banner-img" class="absolute inset-0 bg-cover bg-center transition-all duration-700 transform scale-105" style="background-image: url('https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&auto=format&fit=crop&q=80');">
+          <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent"></div>
+        </div>
+        <div class="relative h-full flex flex-col justify-between p-4 z-10 text-white">
+          <div>
+            <div id="banner-tag" class="inline-flex items-center space-x-1 bg-amber-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full mb-1">
+              CHEF SPECIAL
+            </div>
+            <h2 id="banner-title" class="text-xl font-black leading-tight drop-shadow-md">Asian Bites & Dimsums</h2>
+            <p id="banner-sub" class="text-xs text-amber-100 font-medium mt-0.5 line-clamp-1">Get 20% OFF on Dimsums & Small Bites</p>
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <button onclick="claimOffer('POTS20')" class="inline-flex items-center space-x-1 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+              <span>ORDER NOW</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </button>
+            <span id="banner-badge" class="text-[10px] text-amber-200 bg-black/50 px-2 py-1 rounded-full border border-amber-500/30 font-mono font-semibold">POTS20</span>
+          </div>
+        </div>
+      </div>
+      <!-- Free delivery strip -->
+      <div class="mt-2.5 bg-white rounded-xl py-2 px-3 flex items-center justify-between shadow-xs border border-amber-100">
+        <div class="flex items-center space-x-2">
+          <span class="text-base">☕</span>
+          <div>
+            <p class="text-xs font-bold text-amber-950 leading-tight">Freshly Brewed & Free Delivery</p>
+            <p class="text-[10px] text-gray-500">Add items worth ₹400 to get FREE delivery!</p>
+          </div>
+        </div>
+        <span class="text-[11px] font-bold text-amber-700 shrink-0">Pots & Stones Cafe</span>
+      </div>
+    </div>
+
+    <!-- Category Scroll Bubbles -->
+    <div class="bg-white py-3 border-b border-gray-100">
+      <div class="px-4 mb-2 flex items-center justify-between">
+        <h3 class="text-sm font-black text-[#231b15] tracking-tight">What are you craving today?</h3>
+        <button id="show-all-btn" class="hidden text-[11px] font-bold text-amber-600 hover:underline" onclick="selectCategory('all')">Show All</button>
+      </div>
+
+      <div class="flex overflow-x-auto space-x-3 px-4 pb-1 no-scrollbar">
+        <!-- ALL Button -->
+        <button onclick="selectCategory('all')" class="cat-bubble flex flex-col items-center shrink-0" data-slug="all">
+          <div class="cat-ring w-15 h-15 rounded-full p-0.5 ring-2 ring-amber-600 ring-offset-2 scale-105 transition-all">
+            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#231b15] to-[#423126] flex flex-col items-center justify-center text-white">
+              <span class="text-xs font-black">ALL</span>
+              <span class="text-[8px] font-medium text-amber-300">MENU</span>
+            </div>
+          </div>
+          <span class="mt-1 text-[11px] font-bold text-amber-700 text-center">All Items</span>
+        </button>
+
+        <!-- Asian Bites -->
+        <button onclick="selectCategory('asian-bites')" class="cat-bubble flex flex-col items-center shrink-0" data-slug="asian-bites">
+          <div class="cat-ring w-15 h-15 rounded-full p-0.5 ring-1 ring-gray-200 transition-all">
+            <div class="w-14 h-14 rounded-full bg-cover bg-center overflow-hidden relative" style="background-image: url('https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=300&auto=format&fit=crop&q=80');">
+              <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <span class="bg-[#231b15]/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border border-amber-500/30">@349</span>
+              </div>
+            </div>
+          </div>
+          <span class="mt-1 text-[11px] font-bold text-gray-700 text-center">Asian Bites</span>
+        </button>
+
+        <!-- Summer Specials -->
+        <button onclick="selectCategory('summer-specials')" class="cat-bubble flex flex-col items-center shrink-0" data-slug="summer-specials">
+          <div class="cat-ring w-15 h-15 rounded-full p-0.5 ring-1 ring-gray-200 transition-all">
+            <div class="w-14 h-14 rounded-full bg-cover bg-center overflow-hidden relative" style="background-image: url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&auto=format&fit=crop&q=80');">
+              <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <span class="bg-[#231b15]/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border border-amber-500/30">@479</span>
+              </div>
+            </div>
+          </div>
+          <span class="mt-1 text-[11px] font-bold text-gray-700 text-center">Summer Specials</span>
+        </button>
+
+        <!-- Thin Crust Pizzas -->
+        <button onclick="selectCategory('classic-pizzas')" class="cat-bubble flex flex-col items-center shrink-0" data-slug="classic-pizzas">
+          <div class="cat-ring w-15 h-15 rounded-full p-0.5 ring-1 ring-gray-200 transition-all">
+            <div class="w-14 h-14 rounded-full bg-cover bg-center overflow-hidden relative" style="background-image: url('https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=300&auto=format&fit=crop&q=80');">
+              <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <span class="bg-[#231b15]/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border border-amber-500/30">@429</span>
+              </div>
+            </div>
+          </div>
+          <span class="mt-1 text-[11px] font-bold text-gray-700 text-center">Pizzas</span>
+        </button>
+
+        <!-- Artisanal Shakes -->
+        <button onclick="selectCategory('craft-shakes')" class="cat-bubble flex flex-col items-center shrink-0" data-slug="craft-shakes">
+          <div class="cat-ring w-15 h-15 rounded-full p-0.5 ring-1 ring-gray-200 transition-all">
+            <div class="w-14 h-14 rounded-full bg-cover bg-center overflow-hidden relative" style="background-image: url('https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300&auto=format&fit=crop&q=80');">
+              <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <span class="bg-[#231b15]/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border border-amber-500/30">@299</span>
+              </div>
+            </div>
+          </div>
+          <span class="mt-1 text-[11px] font-bold text-gray-700 text-center">Shakes</span>
+        </button>
+
+        <!-- Desserts -->
+        <button onclick="selectCategory('desserts')" class="cat-bubble flex flex-col items-center shrink-0" data-slug="desserts">
+          <div class="cat-ring w-15 h-15 rounded-full p-0.5 ring-1 ring-gray-200 transition-all">
+            <div class="w-14 h-14 rounded-full bg-cover bg-center overflow-hidden relative" style="background-image: url('https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=300&auto=format&fit=crop&q=80');">
+              <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <span class="bg-[#231b15]/90 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border border-amber-500/30">@369</span>
+              </div>
+            </div>
+          </div>
+          <span class="mt-1 text-[11px] font-bold text-gray-700 text-center">Desserts</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Veg / Non-Veg Filter Bar -->
+    <div class="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between">
+      <div class="flex items-center space-x-1.5 bg-gray-100 p-1 rounded-xl text-xs font-bold">
+        <button id="veg-all-btn" class="px-3 py-1 rounded-lg bg-[#231b15] text-white shadow-xs" onclick="setVegFilter(null)">All</button>
+        <button id="veg-only-btn" class="px-3 py-1 rounded-lg text-emerald-700 hover:bg-emerald-50" onclick="setVegFilter(true)">🟢 Veg</button>
+        <button id="nonveg-only-btn" class="px-3 py-1 rounded-lg text-red-700 hover:bg-red-50" onclick="setVegFilter(false)">🔴 Non-Veg</button>
+      </div>
+      <span id="items-count-label" class="text-xs font-bold text-gray-400">30 items</span>
+    </div>
+
+    <!-- Main Products Feed -->
+    <main id="products-feed" class="px-4 py-4 space-y-6">
+      <!-- Dynamic Products Grid populated by JS -->
+    </main>
+
+    <!-- Footer Brand Section -->
+    <footer class="px-4 py-6 bg-amber-950/5 border-t border-amber-100 text-center space-y-3">
+      <div class="flex items-center justify-center space-x-2">
+        <span class="text-2xl">☕</span>
+        <span class="font-black text-lg text-[#231b15]">Pots and Stones Coffee & Eatery</span>
+      </div>
+      <p class="text-xs text-amber-900/80 font-medium">पॉट्स एंड स्टोंस कॉफी & ईटरी</p>
+      <div class="flex items-center justify-center space-x-3 text-xs font-bold text-gray-700">
+        <span class="flex items-center space-x-1 bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full">
+          ⭐ 4.2 (2,134+ reviews)
+        </span>
+        <span class="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full">₹400–₹1,400 for two</span>
+      </div>
+      <div class="text-[11px] text-gray-500 space-y-1">
+        <p>📍 171/2, Bareilly - Nainital Rd, opp. KFC, Kathgodam, Haldwani</p>
+        <p class="text-emerald-700 font-semibold">🕒 Open Daily • Closes 10:30 PM</p>
+      </div>
+      <div class="pt-2 text-[10px] text-gray-400">FSSAI Lic No. 10019011002345 • Handcrafted Brews & Bites</div>
+    </footer>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-[#231b15] text-white border-t border-amber-900/40 z-30 shadow-2xl">
+      <!-- Floating Cart Strip -->
+      <div id="cart-strip" class="hidden bg-amber-700 px-4 py-2.5 flex items-center justify-between cursor-pointer" onclick="toggleCartModal(true)">
+        <div class="flex items-center space-x-2 text-white">
+          <span id="cart-count-badge" class="bg-white text-amber-900 font-black text-xs px-2 py-0.5 rounded-full">0 ITEMS</span>
+          <span id="cart-total-badge" class="font-black text-sm">₹0</span>
+        </div>
+        <div class="flex items-center space-x-1 text-xs font-black tracking-wider text-amber-100">
+          <span>VIEW CART</span>
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 py-2 text-[11px] font-bold text-center">
+        <button class="flex flex-col items-center space-y-0.5 text-amber-500">
+          <i data-lucide="utensils" class="w-4 h-4"></i>
+          <span>Menu</span>
+        </button>
+        <button class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white" onclick="claimOffer('POTS20')">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Deals</span>
+        </button>
+        <button class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white" onclick="toggleCartModal(true)">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+          <span>Cart</span>
+        </button>
+        <button class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white" onclick="toggleCartModal(true)">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span>Account</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Customizer Sheet Modal -->
+    <div id="modifier-modal" class="hidden fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs">
+      <div class="absolute inset-0" onclick="closeModifierModal()"></div>
+      <div class="relative w-full max-w-md bg-white rounded-t-3xl shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col animate-slide-up">
+        <div class="flex items-center justify-between px-5 pt-4 pb-3 border-b border-amber-100 bg-[#231b15] text-white">
+          <div class="flex items-center space-x-2">
+            <span id="mod-veg-icon">🟢</span>
+            <h3 id="mod-title" class="font-extrabold text-base leading-tight">Product Name</h3>
+          </div>
+          <button onclick="closeModifierModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">✕</button>
+        </div>
+
+        <div class="overflow-y-auto px-5 py-4 space-y-5 text-sm flex-1">
+          <div class="flex space-x-3 bg-amber-50/50 p-3 rounded-2xl border border-amber-100">
+            <img id="mod-img" src="" class="w-20 h-20 rounded-xl object-cover" />
+            <div class="flex-1 min-w-0">
+              <p id="mod-desc" class="text-xs text-gray-600 line-clamp-2"></p>
+              <div class="mt-2 flex items-center space-x-2">
+                <span id="mod-unit-price" class="text-sm font-black text-gray-900">₹0</span>
+                <span class="text-xs text-gray-400 line-through">₹50 off</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="pizza-size-section">
+            <h4 class="font-black text-xs text-gray-900 uppercase mb-2">1. Select Size</h4>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="selectModSize('Regular', 0)" class="size-opt p-3 rounded-2xl border text-left border-amber-700 bg-amber-50/70 font-bold text-xs" data-size="Regular">Regular<br><span class="text-[10px] text-gray-500 font-normal">Serves 1</span></button>
+              <button onclick="selectModSize('Medium', 120)" class="size-opt p-3 rounded-2xl border text-left border-gray-200 bg-white font-bold text-xs" data-size="Medium">Medium (+₹120)<br><span class="text-[10px] text-gray-500 font-normal">Serves 2</span></button>
+              <button onclick="selectModSize('Large', 220)" class="size-opt p-3 rounded-2xl border text-left border-gray-200 bg-white font-bold text-xs" data-size="Large">Large (+₹220)<br><span class="text-[10px] text-gray-500 font-normal">Serves 4</span></button>
+            </div>
+          </div>
+
+          <div id="pizza-crust-section">
+            <h4 class="font-black text-xs text-gray-900 uppercase mb-2">2. Select Crust</h4>
+            <div class="space-y-2 text-xs">
+              <button onclick="selectModCrust('Classic Thin Crust', 0)" class="crust-opt w-full p-2.5 rounded-xl border border-amber-700 bg-amber-50/50 flex justify-between font-bold" data-crust="Classic Thin Crust">
+                <span>Classic Thin Crust (Included)</span>
+              </button>
+              <button onclick="selectModCrust('Cheese Melt Crust', 60)" class="crust-opt w-full p-2.5 rounded-xl border border-gray-200 flex justify-between font-bold" data-crust="Cheese Melt Crust">
+                <span>Cheese Melt Crust (+₹60)</span>
+              </button>
+              <button onclick="selectModCrust('Herb Infused Crust', 40)" class="crust-opt w-full p-2.5 rounded-xl border border-gray-200 flex justify-between font-bold" data-crust="Herb Infused Crust">
+                <span>Herb Infused Crust (+₹40)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+            <span class="font-bold text-xs text-gray-700">Quantity</span>
+            <div class="flex items-center space-x-3 bg-gray-100 px-3 py-1.5 rounded-xl">
+              <button onclick="changeModQty(-1)" class="w-6 h-6 rounded-md bg-white font-bold">-</button>
+              <span id="mod-qty-val" class="font-black text-sm w-5 text-center">1</span>
+              <button onclick="changeModQty(1)" class="w-6 h-6 rounded-md bg-white font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-white border-t border-gray-200 shadow-lg">
+          <button onclick="confirmAddToCart()" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-extrabold py-3 px-5 rounded-2xl flex items-center justify-between shadow-md">
+            <span>ADD TO ORDER</span>
+            <span id="mod-total-btn" class="text-base font-black">₹0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Drawer Modal -->
+    <div id="cart-modal" class="hidden fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs">
+      <div class="absolute inset-0" onclick="toggleCartModal(false)"></div>
+      <div class="relative w-full max-w-md bg-white rounded-t-3xl shadow-2xl overflow-hidden z-10 max-h-[92vh] flex flex-col animate-slide-up">
+        <div class="flex items-center justify-between px-5 pt-4 pb-3 border-b border-amber-900/20 bg-[#231b15] text-white">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="shopping-bag" class="w-5 h-5 text-amber-500"></i>
+            <div>
+              <h3 class="font-black text-base leading-tight">Your Order Cart</h3>
+              <p id="cart-item-count-text" class="text-[11px] text-amber-200/80 font-medium">0 item(s) selected</p>
+            </div>
+          </div>
+          <button onclick="toggleCartModal(false)" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white">✕</button>
+        </div>
+
+        <div class="overflow-y-auto px-4 py-4 space-y-4 flex-1 text-sm bg-amber-50/30">
+          <div id="cart-empty-view" class="py-12 text-center">
+            <div class="w-16 h-16 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">☕</div>
+            <h4 class="font-extrabold text-base text-gray-800">Your cart is empty</h4>
+            <p class="text-xs text-gray-500 mt-1">Explore our handcrafted dimsums, summer salads, ravioli & artisanal shakes!</p>
+            <button onclick="toggleCartModal(false)" class="mt-4 bg-amber-700 text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-xs">Browse Menu</button>
+          </div>
+
+          <div id="cart-content-view" class="hidden space-y-4">
+            <!-- Delivery mode selector -->
+            <div class="bg-white p-3 rounded-2xl border border-amber-200/60 shadow-xs flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="text-xl">☕</span>
+                <div>
+                  <span id="cart-delivery-mode-label" class="text-xs font-bold text-gray-900 block">Order Mode: Delivery</span>
+                  <span class="text-[10px] text-gray-500">Estimated time: 30-40 mins</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Items List -->
+            <div id="cart-items-container" class="bg-white p-3.5 rounded-2xl border border-amber-200/60 shadow-xs space-y-3 divide-y divide-gray-100"></div>
+
+            <!-- Coupon Box -->
+            <div class="bg-white p-3.5 rounded-2xl border border-amber-200/60 shadow-xs">
+              <div class="flex items-center space-x-2 mb-2">
+                <i data-lucide="tag" class="w-4 h-4 text-amber-700"></i>
+                <span class="text-xs font-black uppercase text-gray-800 tracking-wider">Offers & Coupons</span>
+              </div>
+              <div id="coupon-applied-box" class="hidden flex items-center justify-between bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl">
+                <div>
+                  <span id="applied-coupon-code" class="text-xs font-black text-emerald-800 font-mono"></span>
+                  <span id="applied-coupon-save" class="text-[10px] text-emerald-600 block"></span>
+                </div>
+                <button onclick="removeCoupon()" class="text-[11px] font-bold text-red-600 hover:underline">Remove</button>
+              </div>
+              <div id="coupon-form-box" class="flex space-x-2">
+                <input id="coupon-input-field" type="text" placeholder="e.g. POTS20 / SUMMERFEAST" class="flex-1 bg-amber-50/50 border border-gray-200 rounded-xl px-3 py-2 text-xs uppercase font-mono font-bold outline-none" />
+                <button onclick="applyCouponInput()" class="bg-[#231b15] text-white px-4 py-2 rounded-xl text-xs font-bold">Apply</button>
+              </div>
+              <p id="coupon-feedback" class="text-[11px] mt-1.5 font-semibold hidden"></p>
+            </div>
+
+            <!-- Customer details form -->
+            <div class="bg-white p-3.5 rounded-2xl border border-amber-200/60 shadow-xs space-y-2">
+              <span class="text-xs font-black uppercase text-gray-800 tracking-wider block">Delivery Details</span>
+              <input id="cust-name" type="text" value="Aarav Sharma" placeholder="Your Name" class="w-full bg-amber-50/40 border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-gray-800 outline-none" />
+              <input id="cust-phone" type="tel" value="+91 98765 43210" placeholder="Contact Number (+91)" class="w-full bg-amber-50/40 border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-gray-800 outline-none" />
+              <textarea id="cust-address" rows="2" placeholder="Delivery Address" class="w-full bg-amber-50/40 border border-gray-200 rounded-xl px-3 py-1.5 text-xs text-gray-800 outline-none resize-none">171/2, Bareilly - Nainital Rd, opp. KFC, Kathgodam, Haldwani</textarea>
+            </div>
+
+            <!-- Bill breakdown -->
+            <div class="bg-white p-3.5 rounded-2xl border border-amber-200/60 shadow-xs space-y-2">
+              <span class="text-xs font-black uppercase text-gray-800 tracking-wider block">Bill Summary</span>
+              <div class="space-y-1.5 text-xs text-gray-600">
+                <div class="flex justify-between"><span>Item Total</span><span id="bill-subtotal" class="font-semibold text-gray-900">₹0</span></div>
+                <div id="bill-discount-row" class="hidden flex justify-between text-emerald-600 font-semibold"><span>Coupon Discount</span><span id="bill-discount-val">-₹0</span></div>
+                <div class="flex justify-between"><span>GST & Service Charge (5%)</span><span id="bill-tax" class="font-semibold text-gray-900">₹0</span></div>
+                <div class="flex justify-between"><span>Delivery Fee</span><span id="bill-delivery" class="font-semibold text-gray-900">FREE</span></div>
+                <div class="pt-2 border-t border-gray-100 flex justify-between text-sm font-black text-gray-900">
+                  <span>To Pay</span>
+                  <span id="bill-grandtotal" class="text-base text-amber-800">₹0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="cart-footer-btn" class="hidden p-4 bg-white border-t border-gray-200 shadow-xl">
+          <button onclick="placeOrder()" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-extrabold py-3.5 px-5 rounded-2xl flex items-center justify-between shadow-md">
+            <span id="checkout-total" class="text-base font-black">₹0</span>
+            <span class="text-xs font-black tracking-wider bg-black/20 px-4 py-1.5 rounded-xl">PLACE ORDER ➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Tracker Modal -->
+    <div id="tracker-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+      <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl p-6 overflow-hidden animate-scale-in text-center">
+        <button onclick="closeTrackerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500">✕</button>
+        <div class="w-14 h-14 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl">☕</div>
+        <h3 class="text-lg font-black text-gray-900">Order Placed Successfully!</h3>
+        <p id="tracker-order-id" class="text-xs font-mono font-bold text-gray-500 mt-0.5">Order ID: #POTS-1092</p>
+        <div class="inline-flex items-center space-x-1.5 bg-amber-50 text-amber-900 text-xs font-bold px-3 py-1 rounded-full mt-2 border border-amber-200">
+          <span>Estimated delivery in 25-35 mins</span>
+        </div>
+
+        <div class="py-5 space-y-4 text-left">
+          <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">✓</div>
+            <div><h4 class="text-xs font-extrabold text-gray-900">Order Confirmed</h4><p class="text-[11px] text-gray-500">Sent to Pots & Stones kitchen</p></div>
+          </div>
+          <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-full bg-amber-700 text-white flex items-center justify-center text-xs font-bold animate-pulse">🍳</div>
+            <div><h4 class="text-xs font-extrabold text-amber-800">Preparing Food & Brews</h4><p class="text-[11px] text-gray-500">Artisanal dishes being crafted</p></div>
+          </div>
+          <div class="flex items-start space-x-3 opacity-50">
+            <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold">🛵</div>
+            <div><h4 class="text-xs font-extrabold text-gray-400">Out for Delivery</h4><p class="text-[11px] text-gray-400">Rider on the way</p></div>
+          </div>
+        </div>
+
+        <button onclick="closeTrackerModal()" class="w-full bg-[#231b15] text-white font-bold py-3 rounded-2xl text-xs">Close & Track Order</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Menu Data
+    const PRODUCTS = [
+      // Asian Small Bites
+      { id: 'p1', name: 'Classic Veggie Dimsums', description: 'Soft steamed dumplings stuffed with finely chopped garden vegetables & aromatic seasoning', price: 399, image: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Bestseller', categorySlug: 'asian-bites' },
+      { id: 'p2', name: 'Chilli Oil Chicken Dimsums', description: 'Tender chicken dimsums tossed with house-made fiery chili garlic oil', price: 459, image: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=600&auto=format&fit=crop&q=80', isVeg: false, badge: 'Popular', categorySlug: 'asian-bites' },
+      { id: 'p3', name: 'Chilli Oil Mutton Dimsums', description: 'Succulent minced mutton dumplings topped with signature crispy chilli garlic oil', price: 659, image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&auto=format&fit=crop&q=80', isVeg: false, badge: 'Chef Special', categorySlug: 'asian-bites' },
+      { id: 'p4', name: 'Honey Chilli Potato', description: 'Crispy golden potato fingers tossed in sweet & spicy sesame honey glaze', price: 489, image: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Crunchy', categorySlug: 'asian-bites' },
+      { id: 'p5', name: 'Dynamite Prawns', description: 'Crispy fried prawns coated in spicy sriracha mayo dynamite sauce', price: 799, image: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=600&auto=format&fit=crop&q=80', isVeg: false, badge: 'Must Try', categorySlug: 'asian-bites' },
+      { id: 'p6', name: 'Korean Fried Chicken', description: 'Double crunch fried chicken glazed with sweet, tangy & spicy Gochujang sauce', price: 549, image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80', isVeg: false, badge: 'Trending', categorySlug: 'asian-bites' },
+
+      // Summer Specials
+      { id: 'p7', name: 'Watermelon Feta Salad', description: 'Light crisp hydrating watermelon cubes, crumbled feta cheese, mint sprigs & balsamic drizzle', price: 479, image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Refreshing', categorySlug: 'summer-specials' },
+      { id: 'p8', name: 'Avocado & Mango Salad', description: 'Tender avocado tossed with sun-ripened mangoes & our house-made balsamic vinaigrette', price: 519, image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Chef Special', categorySlug: 'summer-specials' },
+      { id: 'p9', name: 'Spinach Ricotta Ravioli', description: 'Delicate handmade ravioli stuffed with spinach & ricotta with light pomodoro puree', price: 659, image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Signature', categorySlug: 'summer-specials' },
+      { id: 'p10', name: 'Spinach & Feta Cannelloni', description: 'Hand rolled pasta tubes stuffed with baby spinach & feta, baked with pomodoro & mozzarella', price: 599, image: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281292?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Must Try', categorySlug: 'summer-specials' },
+
+      // Thin Crust Pizzas
+      { id: 'p11', name: 'Classic Margherita', description: 'Classic thin crust pizza with basil, tomato sauce & 100% mozzarella cheese', price: 429, image: 'https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Classic', categorySlug: 'classic-pizzas' },
+      { id: 'p12', name: 'Exotic Extravaganza', description: 'Broccoli, bell peppers, zucchini, button mushrooms in authentic marinara base', price: 519, image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Loaded', categorySlug: 'classic-pizzas' },
+      { id: 'p13', name: 'Butter Chicken Pizza', description: 'Indian fusion delight topped with rich creamy butter chicken gravy & cheese', price: 539, image: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=600&auto=format&fit=crop&q=80', isVeg: false, badge: 'Chef Special', categorySlug: 'classic-pizzas' },
+      { id: 'p14', name: 'Chicken Tikka Pizza', description: 'Spicy chicken tikka chunks with marinara, sliced red onions & fresh tomato', price: 529, image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600&auto=format&fit=crop&q=80', isVeg: false, badge: 'Must Try', categorySlug: 'classic-pizzas' },
+
+      // Shakes & Desserts
+      { id: 'p15', name: 'Kitkat Shake', description: 'Chocolate milkshake blended with KitKat chocolate bars & cocoa crunch', price: 339, image: 'https://images.unsplash.com/photo-1579954115545-a95591f28bfc?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Bestseller', categorySlug: 'craft-shakes' },
+      { id: 'p16', name: 'Baked Cheesecake', description: 'Classic velvety New York style baked cheesecake on a buttery crust', price: 379, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Must Try', categorySlug: 'desserts' },
+      { id: 'p17', name: 'Banoffee Pie', description: 'English dessert pie made with bananas, whipped cream & thick caramel toffee', price: 369, image: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?w=600&auto=format&fit=crop&q=80', isVeg: true, badge: 'Chef Special', categorySlug: 'desserts' }
+    ];
+
+    // State Variables
+    let cart = [];
+    let selectedCat = 'all';
+    let vegFilter = null;
+    let deliveryMode = 'Delivery';
+    let appliedCoupon = null;
+    let discountAmount = 0;
+    let currentCustomizingProduct = null;
+    let modSize = 'Regular';
+    let modSizeAddon = 0;
+    let modCrust = 'Classic Thin Crust';
+    let modCrustAddon = 0;
+    let modQty = 1;
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Render Menu Items
+    function renderProducts() {
+      const feed = document.getElementById('products-feed');
+      const filtered = PRODUCTS.filter(p => {
+        if (selectedCat !== 'all' && p.categorySlug !== selectedCat) return false;
+        if (vegFilter !== null && p.isVeg !== vegFilter) return false;
+        return true;
+      });
+
+      document.getElementById('items-count-label').innerText = `${filtered.length} options`;
+
+      let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">';
+      filtered.forEach(p => {
+        const isPizza = p.categorySlug === 'classic-pizzas';
+        const inCartQty = getCartQty(p.id);
+
+        html += `
+          <div class="bg-white rounded-2xl overflow-hidden shadow-xs border border-amber-100/80 transition-all hover:shadow-md flex flex-col justify-between">
+            <div class="relative aspect-[16/10] w-full overflow-hidden bg-amber-50/50">
+              <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" />
+              ${p.badge ? `<div class="absolute top-2.5 left-2.5 bg-[#231b15] text-amber-200 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-amber-500/30">${p.badge}</div>` : ''}
+              <div class="absolute bottom-2.5 left-2.5 bg-white/95 p-1 rounded-md shadow-xs text-xs font-bold">
+                ${p.isVeg ? '🟢' : '🔴'}
+              </div>
+            </div>
+            <div class="p-3.5 flex flex-col flex-1 justify-between">
+              <div>
+                <h3 class="font-extrabold text-sm text-gray-900 leading-tight">${p.name}</h3>
+                <p class="text-xs text-gray-500 line-clamp-2 mt-1">${p.description}</p>
+              </div>
+              <div class="mt-3.5 pt-2 border-t border-amber-5 flex items-center justify-between">
+                <div>
+                  <span class="text-base font-black text-gray-900">₹${p.price}</span>
+                  <span class="text-xs text-gray-400 line-through ml-1">₹${p.price + 50}</span>
+                </div>
+                ${inCartQty > 0 ? `
+                  <div class="flex items-center bg-amber-700 text-white rounded-xl shadow-xs overflow-hidden">
+                    <button onclick="decrementCartItem('${p.id}')" class="px-2.5 py-1.5 font-bold">-</button>
+                    <span class="px-2 font-black text-xs">${inCartQty}</span>
+                    <button onclick="openCustomizer('${p.id}')" class="px-2.5 py-1.5 font-bold">+</button>
+                  </div>
+                ` : `
+                  <button onclick="openCustomizer('${p.id}')" class="bg-amber-700 hover:bg-amber-800 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-xs">
+                    ADD +
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      feed.innerHTML = html;
+    }
+
+    function getCartQty(prodId) {
+      return cart.filter(c => c.productId === prodId).reduce((sum, c) => sum + c.quantity, 0);
+    }
+
+    function setMode(mode) {
+      deliveryMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.className = 'mode-btn py-1.5 px-2 rounded-lg text-center transition-all text-gray-300 hover:text-white';
+      });
+      if (mode === 'Delivery') document.getElementById('mode-delivery').className = 'mode-btn py-1.5 px-2 rounded-lg text-center transition-all bg-amber-600 text-white font-bold shadow-sm';
+      if (mode === 'Takeaway') document.getElementById('mode-takeaway').className = 'mode-btn py-1.5 px-2 rounded-lg text-center transition-all bg-amber-600 text-white font-bold shadow-sm';
+      if (mode === 'Dine-in') document.getElementById('mode-dinein').className = 'mode-btn py-1.5 px-2 rounded-lg text-center transition-all bg-amber-600 text-white font-bold shadow-sm';
+      updateCartUI();
+    }
+
+    function selectCategory(slug) {
+      selectedCat = slug;
+      document.getElementById('show-all-btn').className = slug !== 'all' ? 'text-[11px] font-bold text-amber-600 hover:underline' : 'hidden';
+      document.querySelectorAll('.cat-bubble').forEach(b => {
+        const isSel = b.getAttribute('data-slug') === slug;
+        const ring = b.querySelector('.cat-ring');
+        if (isSel) {
+          ring.className = 'cat-ring w-15 h-15 rounded-full p-0.5 ring-2 ring-amber-600 ring-offset-2 scale-105 transition-all';
+        } else {
+          ring.className = 'cat-ring w-15 h-15 rounded-full p-0.5 ring-1 ring-gray-200 transition-all';
+        }
+      });
+      renderProducts();
+    }
+
+    function setVegFilter(val) {
+      vegFilter = val;
+      document.getElementById('veg-all-btn').className = val === null ? 'px-3 py-1 rounded-lg bg-[#231b15] text-white shadow-xs' : 'px-3 py-1 rounded-lg text-gray-600 hover:bg-gray-200';
+      document.getElementById('veg-only-btn').className = val === true ? 'px-3 py-1 rounded-lg bg-emerald-700 text-white shadow-xs' : 'px-3 py-1 rounded-lg text-emerald-700 hover:bg-emerald-50';
+      document.getElementById('nonveg-only-btn').className = val === false ? 'px-3 py-1 rounded-lg bg-red-700 text-white shadow-xs' : 'px-3 py-1 rounded-lg text-red-700 hover:bg-red-50';
+      renderProducts();
+    }
+
+    // Customizer Modal Logic
+    function openCustomizer(prodId) {
+      const prod = PRODUCTS.find(p => p.id === prodId);
+      if (!prod) return;
+      currentCustomizingProduct = prod;
+
+      const isPizza = prod.categorySlug === 'classic-pizzas';
+      document.getElementById('pizza-size-section').style.display = isPizza ? 'block' : 'none';
+      document.getElementById('pizza-crust-section').style.display = isPizza ? 'block' : 'none';
+
+      document.getElementById('mod-veg-icon').innerText = prod.isVeg ? '🟢' : '🔴';
+      document.getElementById('mod-title').innerText = prod.name;
+      document.getElementById('mod-img').src = prod.image;
+      document.getElementById('mod-desc').innerText = prod.description;
+
+      modSize = 'Regular';
+      modSizeAddon = 0;
+      modCrust = 'Classic Thin Crust';
+      modCrustAddon = 0;
+      modQty = 1;
+
+      updateModCalc();
+      document.getElementById('modifier-modal').classList.remove('hidden');
+    }
+
+    function selectModSize(size, addon) {
+      modSize = size;
+      modSizeAddon = addon;
+      document.querySelectorAll('.size-opt').forEach(b => {
+        const isSel = b.getAttribute('data-size') === size;
+        b.className = isSel ? 'size-opt p-3 rounded-2xl border text-left border-amber-700 bg-amber-50/70 font-bold text-xs' : 'size-opt p-3 rounded-2xl border text-left border-gray-200 bg-white font-bold text-xs';
+      });
+      updateModCalc();
+    }
+
+    function selectModCrust(crust, addon) {
+      modCrust = crust;
+      modCrustAddon = addon;
+      document.querySelectorAll('.crust-opt').forEach(b => {
+        const isSel = b.getAttribute('data-crust') === crust;
+        b.className = isSel ? 'crust-opt w-full p-2.5 rounded-xl border border-amber-700 bg-amber-50/50 flex justify-between font-bold' : 'crust-opt w-full p-2.5 rounded-xl border border-gray-200 flex justify-between font-bold';
+      });
+      updateModCalc();
+    }
+
+    function changeModQty(delta) {
+      modQty = Math.max(1, modQty + delta);
+      document.getElementById('mod-qty-val').innerText = modQty;
+      updateModCalc();
+    }
+
+    function updateModCalc() {
+      const unit = currentCustomizingProduct.price + modSizeAddon + modCrustAddon;
+      const total = unit * modQty;
+      document.getElementById('mod-unit-price').innerText = `₹${unit}`;
+      document.getElementById('mod-total-btn').innerText = `₹${total}`;
+    }
+
+    function closeModifierModal() {
+      document.getElementById('modifier-modal').classList.add('hidden');
+    }
+
+    function confirmAddToCart() {
+      const isPizza = currentCustomizingProduct.categorySlug === 'classic-pizzas';
+      const itemPrice = currentCustomizingProduct.price + modSizeAddon + modCrustAddon;
+
+      const cartItem = {
+        id: `${currentCustomizingProduct.id}-${modSize}-${modCrust}`,
+        productId: currentCustomizingProduct.id,
+        name: currentCustomizingProduct.name,
+        price: itemPrice,
+        size: isPizza ? modSize : 'Standard',
+        crust: isPizza ? modCrust : 'Standard',
+        quantity: modQty,
+        isVeg: currentCustomizingProduct.isVeg
+      };
+
+      const existingIndex = cart.findIndex(c => c.id === cartItem.id);
+      if (existingIndex > -1) {
+        cart[existingIndex].quantity += modQty;
+      } else {
+        cart.push(cartItem);
+      }
+
+      closeModifierModal();
+      updateCartUI();
+      renderProducts();
+    }
+
+    function decrementCartItem(prodId) {
+      const idx = cart.findIndex(c => c.productId === prodId);
+      if (idx > -1) {
+        if (cart[idx].quantity > 1) {
+          cart[idx].quantity -= 1;
+        } else {
+          cart.splice(idx, 1);
+        }
+      }
+      updateCartUI();
+      renderProducts();
+    }
+
+    // Cart Modal & Checkout Logic
+    function toggleCartModal(open) {
+      const modal = document.getElementById('cart-modal');
+      if (open) {
+        modal.classList.remove('hidden');
+        renderCartDetails();
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function updateCartUI() {
+      const totalQty = cart.reduce((sum, c) => sum + c.quantity, 0);
+      const subtotal = cart.reduce((sum, c) => sum + (c.price * c.quantity), 0);
+
+      const strip = document.getElementById('cart-strip');
+      if (totalQty > 0) {
+        strip.classList.remove('hidden');
+        document.getElementById('cart-count-badge').innerText = `${totalQty} ITEMS`;
+        document.getElementById('cart-total-badge').innerText = `₹${subtotal}`;
+      } else {
+        strip.classList.add('hidden');
+      }
+    }
+
+    function renderCartDetails() {
+      const totalQty = cart.reduce((sum, c) => sum + c.quantity, 0);
+      const subtotal = cart.reduce((sum, c) => sum + (c.price * c.quantity), 0);
+
+      document.getElementById('cart-item-count-text').innerText = `${totalQty} item(s) selected`;
+      document.getElementById('cart-delivery-mode-label').innerText = `Order Mode: ${deliveryMode}`;
+
+      if (cart.length === 0) {
+        document.getElementById('cart-empty-view').classList.remove('hidden');
+        document.getElementById('cart-content-view').classList.add('hidden');
+        document.getElementById('cart-footer-btn').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('cart-empty-view').classList.add('hidden');
+      document.getElementById('cart-content-view').classList.remove('hidden');
+      document.getElementById('cart-footer-btn').classList.remove('hidden');
+
+      // Render items list
+      const container = document.getElementById('cart-items-container');
+      let html = '';
+      cart.forEach((item, idx) => {
+        html += `
+          <div class="py-2 flex items-center justify-between">
+            <div>
+              <h4 class="font-extrabold text-xs text-gray-900">${item.isVeg ? '🟢' : '🔴'} ${item.name}</h4>
+              <p class="text-[10px] text-gray-500">${item.size !== 'Standard' ? `Size: ${item.size} • ` : ''}₹${item.price} each</p>
+            </div>
+            <div class="flex items-center space-x-2 bg-amber-50 px-2 py-1 rounded-xl border border-amber-200">
+              <button onclick="changeCartQtyIndex(${idx}, -1)" class="font-bold text-xs px-1.5">-</button>
+              <span class="font-black text-xs w-4 text-center">${item.quantity}</span>
+              <button onclick="changeCartQtyIndex(${idx}, 1)" class="font-bold text-xs px-1.5">+</button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+
+      // Bill calculations
+      const tax = Math.round(subtotal * 0.05);
+      const delFee = (deliveryMode === 'Delivery' && subtotal < 400) ? 40 : 0;
+      const grandTotal = Math.max(0, subtotal + tax + delFee - discountAmount);
+
+      document.getElementById('bill-subtotal').innerText = `₹${subtotal}`;
+      document.getElementById('bill-tax').innerText = `₹${tax}`;
+      document.getElementById('bill-delivery').innerText = delFee === 0 ? 'FREE' : `₹${delFee}`;
+      document.getElementById('bill-grandtotal').innerText = `₹${grandTotal}`;
+      document.getElementById('checkout-total').innerText = `₹${grandTotal}`;
+
+      if (appliedCoupon) {
+        document.getElementById('bill-discount-row').classList.remove('hidden');
+        document.getElementById('bill-discount-val').innerText = `-₹${discountAmount}`;
+      } else {
+        document.getElementById('bill-discount-row').classList.add('hidden');
+      }
+    }
+
+    function changeCartQtyIndex(idx, delta) {
+      if (cart[idx]) {
+        cart[idx].quantity += delta;
+        if (cart[idx].quantity <= 0) {
+          cart.splice(idx, 1);
+        }
+      }
+      updateCartUI();
+      renderCartDetails();
+      renderProducts();
+    }
+
+    function claimOffer(code) {
+      appliedCoupon = code;
+      if (code === 'POTS20') discountAmount = 100;
+      if (code === 'SUMMERFEAST') discountAmount = 120;
+      if (code === 'STONES100') discountAmount = 100;
+
+      document.getElementById('coupon-applied-box').classList.remove('hidden');
+      document.getElementById('coupon-form-box').classList.add('hidden');
+      document.getElementById('applied-coupon-code').innerText = code;
+      document.getElementById('applied-coupon-save').innerText = `Saved ₹${discountAmount} on this order`;
+
+      toggleCartModal(true);
+    }
+
+    function applyCouponInput() {
+      const code = document.getElementById('coupon-input-field').value.trim().toUpperCase();
+      if (!code) return;
+      claimOffer(code);
+    }
+
+    function removeCoupon() {
+      appliedCoupon = null;
+      discountAmount = 0;
+      document.getElementById('coupon-applied-box').classList.add('hidden');
+      document.getElementById('coupon-form-box').classList.remove('hidden');
+      renderCartDetails();
+    }
+
+    function placeOrder() {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      toggleCartModal(false);
+      document.getElementById('tracker-modal').classList.remove('hidden');
+      document.getElementById('tracker-order-id').innerText = `Order ID: #POTS-${Math.floor(100000 + Math.random() * 900000)}`;
+      cart = [];
+      appliedCoupon = null;
+      discountAmount = 0;
+      updateCartUI();
+      renderProducts();
+    }
+
+    function closeTrackerModal() {
+      document.getElementById('tracker-modal').classList.add('hidden');
+    }
+
+    // Toggle search bar
+    document.getElementById('search-toggle-btn').addEventListener('click', () => {
+      const container = document.getElementById('search-bar-container');
+      container.classList.toggle('hidden');
+    });
+
+    // Initial render
+    renderProducts();
+  </script>
+</body>
+</html>
